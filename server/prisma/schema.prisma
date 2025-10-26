@@ -1,0 +1,55 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  userId       String   @id @default(uuid())
+  email        String   @unique
+  password     String
+  username     String   @unique
+  tweets       Tweet[]
+  sharedTweets Shared[] @relation("sharedTo")
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model Tweet {
+  tweetId    String       @id @default(uuid())
+  content    String
+  authorId   String
+  author     User         @relation(fields: [authorId], references: [userId])
+  sharedWith Shared[]
+  images     TweetImage[]
+  createdAt  DateTime     @default(now())
+  updatedAt  DateTime     @updatedAt
+  @@index([authorId])
+  @@index([createdAt])
+}
+
+model TweetImage {
+  imageId    String   @id @default(uuid())
+  tweetRefId String
+  tweet      Tweet    @relation(fields: [tweetRefId], references: [tweetId], onDelete: Cascade)
+  url        String
+  publicId   String
+  createdAt  DateTime @default(now())
+
+  @@index([tweetRefId])
+}
+
+model Shared {
+  shareId     String   @id @default(uuid())
+  tweetRefId  String
+  recipientId String
+  tweet       Tweet    @relation(fields: [tweetRefId], references: [tweetId])
+  recipient   User     @relation(fields: [recipientId], references: [userId], name: "sharedTo")
+  createdAt   DateTime @default(now())
+  @@index([tweetRefId])
+  @@index([recipientId])
+}
