@@ -27,7 +27,7 @@ const Home = () => {
             </p>
 
             <div className="flex flex-col sm:flex-row gap-4">
-              <Link to="//auth/register">
+              <Link to="/auth/register">
                 <Button size="lg" className="w-full sm:w-auto text-lg px-8">
                   Get Started
                 </Button>
